@@ -1,3 +1,5 @@
+import ContactForm from "./contact-form";
+
 export const metadata = {
   title: "Contact | Jack Ning",
 };
@@ -9,8 +11,10 @@ export default function Contact() {
         Contact
       </h1>
       <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-        Let&apos;s connect — contact details coming soon.
+        Want to talk about edge AI, crypto, or an opportunity? Send me a
+        message and I&apos;ll get back to you.
       </p>
+      <ContactForm />
     </section>
   );
 }

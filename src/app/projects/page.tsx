@@ -12,7 +12,7 @@ export default function Projects() {
         Projects
       </h1>
       <div className="mt-10 grid gap-6">
-        {projects.map(({ slug, title, context, description, tech }) => (
+        {projects.map(({ slug, title, context, summary, tech }) => (
           <Link
             key={slug}
             href={`/projects/${slug}`}
@@ -27,7 +27,7 @@ export default function Projects() {
               </p>
             ) : null}
             <p className="mt-3 max-w-2xl leading-7 text-zinc-600 dark:text-zinc-400">
-              {description}
+              {summary}
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {tech.map((item) => (

@@ -45,7 +45,7 @@ export default function Home() {
           View my projects
         </Link>
         <Link
-          href="/contact"
+          href="/contact-me-server-form"
           className="rounded-full border border-zinc-300 px-6 py-3 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-900"
         >
           Get in touch

@@ -42,8 +42,27 @@ export default async function ProjectPage({
         </p>
       ) : null}
       <p className="mt-6 text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-        {project.description}
+        {project.overview}
       </p>
+
+      <h2 className="mt-10 text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+        What it does
+      </h2>
+      <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+        {project.features.map(({ title, detail }) => (
+          <li
+            key={title}
+            className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900"
+          >
+            <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
+              {title}
+            </h3>
+            <p className="mt-1.5 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+              {detail}
+            </p>
+          </li>
+        ))}
+      </ul>
 
       <h2 className="mt-10 text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
         Tech
