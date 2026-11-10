@@ -49,3 +49,16 @@ Result: Committed the contact form work.
 > Create a README.md and prompt log file. Commit
 
 Result: Added this prompt log and the project README, then committed both.
+
+## 9. Critique of the AI's work
+
+> Create CRITIQUE.md with the text: Critique 1. Routes — src/app/about-me/page.tsx (commit 0f16d8e), src/app/contact-me-server-form (commit 1cf6e7f). Viber proposed: /about and /contact (commit 9cd5cc8). I changed: renamed them to /about-me and /contact-me-server-form. Why: those are the required URLs. Check: opened /about-me and /contact-me-server-form → both load. 2. Contact validation — src/app/contact-me-server-form/actions.ts (commit 1cf6e7f). Viber proposed: a Server Action that validates name, email and message and saves valid entries. I kept it after testing. Why: the server must reject bad input, not just the browser. Check: submitted blank name, a@b..com, a valid entry → red errors for the bad ones; the valid one showed success and appeared in data/contact-submissions.json.
+
+Result: Added CRITIQUE.md documenting route fixes I requested and the contact validation I kept after testing.
+
+## 10. Publish
+
+> Update the prompt log file. Commit and push this to a new public GitHub repo called jack-portfolio.
+
+Result: Updated this log, committed, and pushed the site to the public GitHub repo `jack-portfolio`.
+
