@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Jack (Kunjun) Ning — Personal Portfolio
+
+Personal portfolio website for Jack (Kunjun) Ning, STEM MBA candidate in Silicon Valley with 7 years of pre-MBA experience in crypto investment and business development, interested in edge AI wearables and multimodal memory/companion devices.
+
+Built with [Next.js](https://nextjs.org) (App Router, Server Actions), React, TypeScript, and Tailwind CSS.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Other scripts:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build   # production build
+npm run start   # serve the production build
+npm run lint    # run ESLint
+```
 
-## Learn More
+## Routes
 
-To learn more about Next.js, take a look at the following resources:
+| Route | Description |
+| --- | --- |
+| `/` | Homepage introducing Jack |
+| `/about-me` | Education, experience, and skills |
+| `/projects` | Project index |
+| `/projects/aide-commerce` | Aide-commerce — AI shopping agent safety (AWS x A10 Hack 2026) |
+| `/projects/products-cli` | Product Inventory CLI — Python CRUD tool |
+| `/contact-me-server-form` | Contact form |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Contact Form
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The contact page uses a Next.js Server Action to validate and store submissions.
 
-## Deploy on Vercel
+- **Fields:** Name, Email, Message
+- **Validation:**
+  - Name and message can't be empty
+  - Email must contain exactly one `@`, have text before it, contain no spaces, and have a domain with a dot and no empty parts between dots
+- Invalid input returns an error message under each bad field.
+- Valid submissions are appended (with an ISO timestamp) to `data/contact-submissions.json`, and the site shows a success message.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/                        # App Router pages
+│   ├── page.tsx                # Homepage
+│   ├── about-me/
+│   ├── projects/
+│   │   ├── page.tsx            # Project index
+│   │   └── [slug]/page.tsx     # Dynamically routed project details
+│   └── contact-me-server-form/ # Contact page, server action, client form
+├── components/
+│   └── Navbar.tsx              # Nav bar with active-link highlighting
+└── lib/
+    └── projects.ts             # Shared project data
+data/
+└── contact-submissions.json    # Contact form submissions
+```
