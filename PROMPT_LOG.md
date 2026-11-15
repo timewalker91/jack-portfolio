@@ -98,3 +98,9 @@ Result: Removed the data-file mention from the UI, seeded two blog posts written
 
 Result: Updated this log with all entries since the last update and appended critique items 3 and 4 to CRITIQUE.md, then committed.
 
+## 17. Move the create page back to /admin/blogs
+
+> Keep the front end as it is, but move the new post page back from /blogs/new to /admin/blogs. Then update prompt.md. Commit.
+
+Result: Moved the create-post page back to `/admin/blogs` (keeping the "New Post" heading and UI); the "New Post" button on the blog list now points there, and the top bar still has the single "Blog" link to the list.
+
