@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "id": "ebab7e48-a394-427a-9e35-5a396d896954",
+    "title": "From Crypto Markets to Edge AI Wearables",
+    "content": "My path into tech ran through crypto. Seven years across MEXC Global, OKX Ventures, Mindfulness Capital and FutureMoney taught me how new platforms find product-market fit, how incentives shape user behavior, and how fast \"emerging\" becomes \"everyday\".\n\nNow, as a STEM MBA candidate at the Leavey School of Business, Santa Clara University, I'm applying that lens to edge AI wearables. The crypto thesis was simple: remove the middleman. The edge AI thesis rhymes: move intelligence off the cloud and onto the device.\n\nOn-device inference means lower latency, better privacy, and no connectivity tax \u2014 exactly what wearables need to become genuinely useful instead of notification relays. Walking around Silicon Valley, it feels like the early days of crypto: infrastructure quietly getting good while everyone waits for the interface that makes it mainstream.\n\nI believe the teams that win will pair hardware discipline with business-model creativity \u2014 the same pairing that separated durable crypto companies from the ones that faded.",
+    "createdAt": "2026-11-15T07:14:39.913345Z"
+  },
+  {
+    "id": "64b8b595-4f82-4128-9889-c0944d954a14",
+    "title": "Multimodal Memory: What Companion Devices Should Remember",
+    "content": "Everyone is building AI companions. Very few are building AI companions that remember. Memory \u2014 across voice, vision, and text \u2014 is what turns a chatbot into a companion.\n\nAt the AWS x A10 Hack 2026, my team of four built Aide-commerce: an AI shopping agent with its own identity, every action checked, and a kill switch that refuses the agent's next request in about 0.7 seconds. Building it convinced me that trust and control matter more than raw model quality \u2014 especially for devices that share your daily life.\n\nMultimodal memory and companion devices raise the stakes, because they see and hear everything. The questions I keep coming back to: What should be remembered? Who is allowed to replay a memory? How does a user stop the device mid-task, and how fast does it comply?\n\nMy answer, borrowed from years in crypto investment and business development: design for accountability first. Identity, auditability, and an instant off switch aren't compliance checkboxes \u2014 they are the product.",
+    "createdAt": "2026-11-15T06:54:39.913345Z"
+  }
+]
