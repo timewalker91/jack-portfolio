@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { saveBlogPost, validateBlogInput } from "@/lib/blogs";
+import { readBlogPosts, saveBlogPost, validateBlogInput } from "@/lib/blogs";
+
+export async function GET() {
+  const posts = await readBlogPosts();
+  return NextResponse.json({ posts });
+}
 
 export async function POST(request: Request) {
   let payload: unknown;
@@ -25,7 +30,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ status: "error", errors }, { status: 400 });
   }
 
-  await saveBlogPost({ title, content });
+  const post = await saveBlogPost({ title, content });
 
-  return NextResponse.json({ status: "success" }, { status: 201 });
+  return NextResponse.json({ status: "success", post }, { status: 201 });
 }

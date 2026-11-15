@@ -34,7 +34,9 @@ npm run lint    # run ESLint
 | `/contact-me` | Contact form (client-side fetch) |
 | `/api/contacts` | `POST` endpoint the `/contact-me` form calls |
 | `/admin/blogs` | Create a blog post (title + content) |
-| `/api/blogs` | `POST` endpoint the `/admin/blogs` form calls |
+| `/api/blogs` | `GET` lists posts / `POST` creates a post |
+| `/blogs` | Blog list, loaded via the API |
+| `/blogs/[id]` | Dynamically routed blog post page |
 
 ## Contact Form
 

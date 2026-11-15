@@ -12,6 +12,28 @@ export type BlogInput = {
   content: string;
 };
 
+export type BlogPost = {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: string;
+};
+
+function blogDataFile(): string {
+  return path.join(process.cwd(), "data", "blog-posts.json");
+}
+
+export async function readBlogPosts(): Promise<BlogPost[]> {
+  try {
+    const parsed: unknown = JSON.parse(
+      await fs.readFile(blogDataFile(), "utf8")
+    );
+    return Array.isArray(parsed) ? (parsed as BlogPost[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 export function validateBlogInput(input: BlogInput): BlogErrors {
   const errors: BlogErrors = {};
   if (!input.title) errors.title = "Title can't be empty.";
@@ -19,27 +41,24 @@ export function validateBlogInput(input: BlogInput): BlogErrors {
   return errors;
 }
 
-export async function saveBlogPost(input: BlogInput): Promise<void> {
-  const post = {
+export async function saveBlogPost(input: BlogInput): Promise<BlogPost> {
+  const post: BlogPost = {
     id: randomUUID(),
     title: input.title,
     content: input.content,
     createdAt: new Date().toISOString(),
   };
 
-  const dataDir = path.join(process.cwd(), "data");
-  const dataFile = path.join(dataDir, "blog-posts.json");
-
-  await fs.mkdir(dataDir, { recursive: true });
-
-  let posts: unknown[] = [];
-  try {
-    const parsed: unknown = JSON.parse(await fs.readFile(dataFile, "utf8"));
-    if (Array.isArray(parsed)) posts = parsed;
-  } catch {
-    posts = [];
-  }
-
+  const posts = await readBlogPosts();
   posts.push(post);
-  await fs.writeFile(dataFile, JSON.stringify(posts, null, 2) + "\n", "utf8");
+
+  const dataDir = path.dirname(blogDataFile());
+  await fs.mkdir(dataDir, { recursive: true });
+  await fs.writeFile(
+    blogDataFile(),
+    JSON.stringify(posts, null, 2) + "\n",
+    "utf8"
+  );
+
+  return post;
 }

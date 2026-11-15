@@ -9,6 +9,8 @@ const links = [
   { href: "/projects", label: "Projects" },
   { href: "/contact-me-server-form", label: "Contact" },
   { href: "/contact-me", label: "Contact API" },
+  { href: "/admin/blogs", label: "Blog" },
+  { href: "/blogs", label: "Blog API" },
 ];
 
 export default function Navbar() {
