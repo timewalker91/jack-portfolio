@@ -8,6 +8,7 @@ const links = [
   { href: "/about-me", label: "About Me" },
   { href: "/projects", label: "Projects" },
   { href: "/contact-me-server-form", label: "Contact" },
+  { href: "/contact-me", label: "Contact API" },
 ];
 
 export default function Navbar() {
@@ -25,7 +26,8 @@ export default function Navbar() {
         <ul className="flex items-center gap-1 sm:gap-2">
           {links.map(({ href, label }) => {
             const active =
-              href === "/" ? pathname === "/" : pathname.startsWith(href);
+              pathname === href ||
+              (href !== "/" && pathname.startsWith(href + "/"));
             return (
               <li key={href}>
                 <Link

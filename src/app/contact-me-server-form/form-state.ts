@@ -1,8 +1,4 @@
-export type ContactErrors = {
-  name?: string;
-  email?: string;
-  message?: string;
-};
+import type { ContactErrors } from "@/lib/contact";
 
 export type ContactFormState = {
   status: "idle" | "success" | "error";

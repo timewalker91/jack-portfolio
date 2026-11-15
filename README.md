@@ -30,7 +30,9 @@ npm run lint    # run ESLint
 | `/projects` | Project index |
 | `/projects/aide-commerce` | Aide-commerce — AI shopping agent safety (AWS x A10 Hack 2026) |
 | `/projects/products-cli` | Product Inventory CLI — Python CRUD tool |
-| `/contact-me-server-form` | Contact form |
+| `/contact-me-server-form` | Contact form (Next.js Server Action) |
+| `/contact-me` | Contact form (client-side fetch) |
+| `/api/contacts` | `POST` endpoint the `/contact-me` form calls |
 
 ## Contact Form
 
