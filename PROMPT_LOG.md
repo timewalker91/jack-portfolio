@@ -62,3 +62,39 @@ Result: Added CRITIQUE.md documenting route fixes I requested and the contact va
 
 Result: Updated this log, committed, and pushed the site to the public GitHub repo `jack-portfolio`.
 
+## 11. Contact page with a client-side form and API
+
+> Add a new /contact-me page with the same components of name, email and message. Build a API to support a POST request to /api/contacts. The page makes a call to /api/contacts, and store all contact information as the server form submissions in a JSON.
+
+Result: Added the `/contact-me` page (client-side fetch form) and a `POST /api/contacts` route that reuses the same validation and stores to the same JSON file as the server-form submissions. Verified with automated browser and API tests.
+
+## 12. Commit and the missing nav entrance
+
+> Commit. But where is the entrance of this new /contact-me page? I can't see the entrance on the page.
+
+Result: Committed, and added a "Contact API" link to the top bar so the page is reachable from the nav.
+
+## 13. Blog admin page and API
+
+> Create an /admin/blogs page. Build the UX to create a blog post including title and content sections, which will POST to /api/blogs, build the API to support a POST request to /api/blogs. Save the successful blog submissions to a JSON file. Commit.
+
+Result: Added the `/admin/blogs` create-post form and a `POST /api/blogs` route that validates title/content and saves posts (id + timestamp) to `data/blog-posts.json`.
+
+## 14. Blog list page and dynamic post routes
+
+> Make the /admin/blogs page Blog on nav bar. Add a new /blogs page that makes an API call to /api/blogs. Make this new page Blog API on nav bar. Build the API to support a GET request to /api/blogs to populate /blog-posts and show the blogs on /blogs. Apply dynamic routing to all the blog post. Commit.
+
+Result: Added `GET /api/blogs`, a `/blogs` list page loaded via the API, dynamically routed `/blogs/[id]` post pages, and "Blog" / "Blog API" nav links.
+
+## 15. Blog cleanup, seeded posts, contact API parity
+
+> At Blog page, you don't need to say Published posts are saved to data/blog-posts.json at the front end. Fix it. Create two random new blogs according to the information I provided. Using the same rules of contact format to Contact API page. Use the same returns as Contact page when the input is wrong. Make Blog page a subpage in Blog API called New Post to create new posts, and remove it from nav bar. Change the name Blog API to Blog.
+
+Result: Removed the data-file mention from the UI, seeded two blog posts written from the background information provided, confirmed both contact forms return identical errors, moved the create page to `/blogs/new` ("New Post" subpage with a button on the blog list), and renamed the nav label to "Blog".
+
+## 16. Prompt log and critique update
+
+> Create a prompt log file. Update CRITIQUE.md with the text: [critique items 3 and 4 about the missing contact link and the confusing top-bar labels]. Commit.
+
+Result: Updated this log with all entries since the last update and appended critique items 3 and 4 to CRITIQUE.md, then committed.
+
