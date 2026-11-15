@@ -33,6 +33,8 @@ npm run lint    # run ESLint
 | `/contact-me-server-form` | Contact form (Next.js Server Action) |
 | `/contact-me` | Contact form (client-side fetch) |
 | `/api/contacts` | `POST` endpoint the `/contact-me` form calls |
+| `/admin/blogs` | Create a blog post (title + content) |
+| `/api/blogs` | `POST` endpoint the `/admin/blogs` form calls |
 
 ## Contact Form
 
