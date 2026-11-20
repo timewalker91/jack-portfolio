@@ -34,9 +34,13 @@ npm run lint    # run ESLint
 | `/contact-me` | Contact form (client-side fetch) |
 | `/api/contacts` | `POST` endpoint the `/contact-me` form calls |
 | `/blogs` | Blog list, loaded via the API |
-| `/admin/blogs` | New Post — create a blog post (title + content) |
 | `/blogs/[id]` | Dynamically routed blog post page |
+| `/events` | Industry events, conferences, and hackathons attended (read-only) |
+| `/admin/blogs` | New Post — create a blog post (title + content) |
+| `/admin/events` | Add or edit events (name, date, optional links, takeaway) |
 | `/api/blogs` | `GET` lists posts / `POST` creates a post |
+| `/api/events` | `GET` lists events / `POST` creates an event |
+| `/api/events/[id]` | `POST` updates an event |
 
 ## Contact Form
 
@@ -48,6 +52,7 @@ The contact page uses a Next.js Server Action to validate and store submissions.
   - Email must contain exactly one `@`, have text before it, contain no spaces, and have a domain with a dot and no empty parts between dots
 - Invalid input returns an error message under each bad field.
 - Valid submissions are appended (with an ISO timestamp) to `data/contact-submissions.json`, and the site shows a success message.
+- The `/contact-me` form autosaves a draft to browser LocalStorage while typing, restores it after a refresh with a "Draft saved" note, and clears it after a successful send.
 
 ## Project Structure
 
