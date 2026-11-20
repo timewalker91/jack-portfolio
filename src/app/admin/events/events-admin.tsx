@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import type { EventErrors, EventInput, EventItem } from "@/lib/events";
+import { relativeTime } from "@/lib/relative-time";
 
 const emptyForm: EventInput = {
   name: "",
-  date: "",
   eventLink: "",
   myLink: "",
   takeaway: "",
@@ -36,7 +36,9 @@ export default function EventsAdmin() {
       const res = await fetch("/api/events", { cache: "no-store" });
       if (!res.ok) return;
       const data = (await res.json()) as { events: EventItem[] };
-      setEvents([...data.events].sort((a, b) => b.date.localeCompare(a.date)));
+      setEvents(
+        [...data.events].sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+      );
     } catch {
       return;
     }
@@ -57,7 +59,6 @@ export default function EventsAdmin() {
     setEditingId(event.id);
     setValues({
       name: event.name,
-      date: event.date,
       eventLink: event.eventLink,
       myLink: event.myLink,
       takeaway: event.takeaway,
@@ -85,7 +86,7 @@ export default function EventsAdmin() {
       const res = await fetch(
         editingId ? `/api/events/${editingId}` : "/api/events",
         {
-          method: "POST",
+          method: editingId ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
         }
@@ -144,24 +145,6 @@ export default function EventsAdmin() {
               className={fieldClassName}
             />
             <FieldError message={errors.name} />
-          </div>
-
-          <div>
-            <label
-              htmlFor="date"
-              className="mb-1.5 block text-sm font-medium text-zinc-900 dark:text-zinc-100"
-            >
-              Date
-            </label>
-            <input
-              id="date"
-              name="date"
-              type="date"
-              value={values.date}
-              onChange={(e) => update("date", e.target.value)}
-              className={fieldClassName}
-            />
-            <FieldError message={errors.date} />
           </div>
 
           <div>
@@ -266,7 +249,9 @@ export default function EventsAdmin() {
                 <p className="font-medium text-zinc-900 dark:text-zinc-100">
                   {event.name}
                 </p>
-                <p className="text-zinc-500 dark:text-zinc-400">{event.date}</p>
+                <p className="text-zinc-500 dark:text-zinc-400">
+                  {relativeTime(event.createdAt)}
+                </p>
                 <button
                   type="button"
                   onClick={() => startEdit(event)}

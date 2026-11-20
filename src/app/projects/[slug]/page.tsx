@@ -1,30 +1,23 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { projects } from "@/lib/projects";
-
-export function generateStaticParams() {
-  return projects.map(({ slug }) => ({ slug }));
-}
+import { Suspense } from "react";
+import { readProjects } from "@/lib/projects";
 
 export async function generateMetadata({
   params,
-}: PageProps<"/projects/[slug]">) {
+}: PageProps<"/projects/[slug]">): Promise<Metadata> {
   const { slug } = await params;
+  const projects = await readProjects();
   const project = projects.find((p) => p.slug === slug);
   return {
-    title: project ? `${project.title} | Jack Ning` : "Projects | Jack Ning",
+    title: project
+      ? `${project.title} | Jack Ning`
+      : "Projects | Jack Ning",
   };
 }
 
-export default async function ProjectPage({
-  params,
-}: PageProps<"/projects/[slug]">) {
-  const { slug } = await params;
-  const project = projects.find((p) => p.slug === slug);
-  if (!project) {
-    notFound();
-  }
-
+export default function ProjectPage({ params }: PageProps<"/projects/[slug]">) {
   return (
     <section className="mx-auto w-full max-w-3xl flex-1 px-6 py-24">
       <Link
@@ -33,6 +26,31 @@ export default async function ProjectPage({
       >
         ← All projects
       </Link>
+      <Suspense
+        fallback={
+          <p className="mt-8 text-sm text-zinc-500">Loading project…</p>
+        }
+      >
+        <ProjectContent params={params} />
+      </Suspense>
+    </section>
+  );
+}
+
+async function ProjectContent({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const projects = await readProjects();
+  const project = projects.find((p) => p.slug === slug);
+  if (!project) {
+    notFound();
+  }
+
+  return (
+    <>
       <h1 className="mt-6 text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
         {project.title}
       </h1>
@@ -45,38 +63,46 @@ export default async function ProjectPage({
         {project.overview}
       </p>
 
-      <h2 className="mt-10 text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-        What it does
-      </h2>
-      <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-        {project.features.map(({ title, detail }) => (
-          <li
-            key={title}
-            className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900"
-          >
-            <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
-              {title}
-            </h3>
-            <p className="mt-1.5 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-              {detail}
-            </p>
-          </li>
-        ))}
-      </ul>
+      {project.features.length > 0 ? (
+        <>
+          <h2 className="mt-10 text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+            What it does
+          </h2>
+          <ul className="mt-4 grid gap-4 sm:grid-cols-2">
+            {project.features.map(({ title, detail }) => (
+              <li
+                key={title}
+                className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900"
+              >
+                <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
+                  {title}
+                </h3>
+                <p className="mt-1.5 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                  {detail}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
 
-      <h2 className="mt-10 text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-        Tech
-      </h2>
-      <ul className="mt-4 flex flex-wrap gap-2">
-        {project.tech.map((item) => (
-          <li
-            key={item}
-            className="rounded-full border border-zinc-200 bg-zinc-50 px-3.5 py-1.5 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
-          >
-            {item}
-          </li>
-        ))}
-      </ul>
-    </section>
+      {project.tech.length > 0 ? (
+        <>
+          <h2 className="mt-10 text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+            Tech
+          </h2>
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {project.tech.map((item) => (
+              <li
+                key={item}
+                className="rounded-full border border-zinc-200 bg-zinc-50 px-3.5 py-1.5 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+    </>
   );
 }

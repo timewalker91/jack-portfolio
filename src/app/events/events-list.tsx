@@ -2,20 +2,35 @@
 
 import { useEffect, useState } from "react";
 import type { EventItem } from "@/lib/events";
+import { relativeTime } from "@/lib/relative-time";
 
-function formatDate(date: string): string {
-  const [y, m, d] = date.split("-").map(Number);
-  if (!y || !m || !d) return date;
-  return new Date(y, m - 1, d).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
+const inputClass =
+  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100";
+
+type EditValues = {
+  name: string;
+  eventLink: string;
+  myLink: string;
+  takeaway: string;
+};
+type EditErrors = {
+  name?: string;
+  eventLink?: string;
+  myLink?: string;
+  takeaway?: string;
+};
 
 export default function EventsList() {
   const [events, setEvents] = useState<EventItem[] | null>(null);
   const [failed, setFailed] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [values, setValues] = useState<EditValues>({
+    name: "",
+    eventLink: "",
+    myLink: "",
+    takeaway: "",
+  });
+  const [errors, setErrors] = useState<EditErrors>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -28,7 +43,9 @@ export default function EventsList() {
         .then((data: { events: EventItem[] }) => {
           if (!cancelled) {
             setEvents(
-              [...data.events].sort((a, b) => b.date.localeCompare(a.date))
+              [...data.events].sort((a, b) =>
+                b.createdAt.localeCompare(a.createdAt)
+              )
             );
           }
         })
@@ -42,6 +59,52 @@ export default function EventsList() {
       window.clearTimeout(timer);
     };
   }, []);
+
+  function load() {
+    fetch("/api/events", { cache: "no-store" })
+      .then((res) => res.json())
+      .then((data: { events: EventItem[] }) =>
+        setEvents(
+          [...data.events].sort((a, b) =>
+            b.createdAt.localeCompare(a.createdAt)
+          )
+        )
+      )
+      .catch(() => setFailed(true));
+  }
+
+  function startEdit(event: EventItem) {
+    setEditingId(event.id);
+    setValues({
+      name: event.name,
+      eventLink: event.eventLink,
+      myLink: event.myLink,
+      takeaway: event.takeaway,
+    });
+    setErrors({});
+  }
+
+  async function saveEdit() {
+    if (!editingId) return;
+    const res = await fetch(`/api/events/${editingId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setEditingId(null);
+      load();
+    } else {
+      setErrors(data.errors ?? {});
+    }
+  }
+
+  async function remove(id: string) {
+    if (!window.confirm("Delete this event?")) return;
+    const res = await fetch(`/api/events/${id}`, { method: "DELETE" });
+    if (res.ok) load();
+  }
 
   if (failed) {
     return (
@@ -65,49 +128,179 @@ export default function EventsList() {
 
   return (
     <ul className="mt-10 grid gap-6">
-      {events.map((event) => (
-        <li
-          key={event.id}
-          className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900"
-        >
-          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-            {event.name}
-          </h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            {formatDate(event.date)}
-          </p>
-          <p className="mt-3 leading-7 text-zinc-600 dark:text-zinc-400">
-            <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              My takeaway:{" "}
-            </span>
-            {event.takeaway}
-          </p>
-          {event.eventLink || event.myLink ? (
-            <div className="mt-4 flex flex-wrap gap-4 text-sm font-medium">
-              {event.eventLink ? (
-                <a
-                  href={event.eventLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-zinc-900 underline underline-offset-2 hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-400"
-                >
-                  Event link ↗
-                </a>
-              ) : null}
-              {event.myLink ? (
-                <a
-                  href={event.myLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-zinc-900 underline underline-offset-2 hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-400"
-                >
-                  My link ↗
-                </a>
+      {events.map((event) =>
+        editingId === event.id ? (
+          <li
+            key={event.id}
+            className="grid gap-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900"
+          >
+            <div>
+              <label
+                htmlFor="edit-event-name"
+                className="mb-1.5 block text-sm font-medium text-zinc-900 dark:text-zinc-100"
+              >
+                Name
+              </label>
+              <input
+                id="edit-event-name"
+                value={values.name}
+                onChange={(e) =>
+                  setValues({ ...values, name: e.target.value })
+                }
+                className={inputClass}
+              />
+              {errors.name ? (
+                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">
+                  {errors.name}
+                </p>
               ) : null}
             </div>
-          ) : null}
-        </li>
-      ))}
+            <div>
+              <label
+                htmlFor="edit-event-link"
+                className="mb-1.5 block text-sm font-medium text-zinc-900 dark:text-zinc-100"
+              >
+                Event link (optional)
+              </label>
+              <input
+                id="edit-event-link"
+                value={values.eventLink}
+                onChange={(e) =>
+                  setValues({ ...values, eventLink: e.target.value })
+                }
+                className={inputClass}
+              />
+              {errors.eventLink ? (
+                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">
+                  {errors.eventLink}
+                </p>
+              ) : null}
+            </div>
+            <div>
+              <label
+                htmlFor="edit-my-link"
+                className="mb-1.5 block text-sm font-medium text-zinc-900 dark:text-zinc-100"
+              >
+                My link (optional)
+              </label>
+              <input
+                id="edit-my-link"
+                value={values.myLink}
+                onChange={(e) =>
+                  setValues({ ...values, myLink: e.target.value })
+                }
+                className={inputClass}
+              />
+              {errors.myLink ? (
+                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">
+                  {errors.myLink}
+                </p>
+              ) : null}
+            </div>
+            <div>
+              <label
+                htmlFor="edit-takeaway"
+                className="mb-1.5 block text-sm font-medium text-zinc-900 dark:text-zinc-100"
+              >
+                My takeaway
+              </label>
+              <textarea
+                id="edit-takeaway"
+                rows={3}
+                value={values.takeaway}
+                onChange={(e) =>
+                  setValues({ ...values, takeaway: e.target.value })
+                }
+                className={inputClass}
+              />
+              {errors.takeaway ? (
+                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">
+                  {errors.takeaway}
+                </p>
+              ) : null}
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={saveEdit}
+                className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+              >
+                Save changes
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingId(null)}
+                className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
+                Cancel
+              </button>
+            </div>
+          </li>
+        ) : (
+          <li
+            key={event.id}
+            className="rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900"
+          >
+            <div className="p-6">
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+                {event.name}
+              </h2>
+              <p
+                className="mt-1 text-sm text-zinc-500 dark:text-zinc-400"
+                title={new Date(event.createdAt).toLocaleString()}
+              >
+                {relativeTime(event.createdAt)}
+              </p>
+              <p className="mt-3 leading-7 text-zinc-600 dark:text-zinc-400">
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                  My takeaway:{" "}
+                </span>
+                {event.takeaway}
+              </p>
+              {event.eventLink || event.myLink ? (
+                <div className="mt-4 flex flex-wrap gap-4 text-sm font-medium">
+                  {event.eventLink ? (
+                    <a
+                      href={event.eventLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-zinc-900 underline underline-offset-2 hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-400"
+                    >
+                      Event link ↗
+                    </a>
+                  ) : null}
+                  {event.myLink ? (
+                    <a
+                      href={event.myLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-zinc-900 underline underline-offset-2 hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-400"
+                    >
+                      My link ↗
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+            <div className="flex gap-2 border-t border-zinc-200 px-6 py-3 dark:border-zinc-800">
+              <button
+                type="button"
+                onClick={() => startEdit(event)}
+                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={() => remove(event.id)}
+                className="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+              >
+                Delete
+              </button>
+            </div>
+          </li>
+        )
+      )}
     </ul>
   );
 }

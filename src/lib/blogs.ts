@@ -62,3 +62,36 @@ export async function saveBlogPost(input: BlogInput): Promise<BlogPost> {
 
   return post;
 }
+
+export async function updateBlogPost(
+  id: string,
+  input: BlogInput
+): Promise<BlogPost | null> {
+  const posts = await readBlogPosts();
+  const index = posts.findIndex((post) => post.id === id);
+  if (index === -1) return null;
+
+  const updated: BlogPost = { ...posts[index], ...input };
+  posts[index] = updated;
+
+  await fs.writeFile(
+    blogDataFile(),
+    JSON.stringify(posts, null, 2) + "\n",
+    "utf8"
+  );
+
+  return updated;
+}
+
+export async function deleteBlogPost(id: string): Promise<boolean> {
+  const posts = await readBlogPosts();
+  const remaining = posts.filter((post) => post.id !== id);
+  if (remaining.length === posts.length) return false;
+
+  await fs.writeFile(
+    blogDataFile(),
+    JSON.stringify(remaining, null, 2) + "\n",
+    "utf8"
+  );
+  return true;
+}

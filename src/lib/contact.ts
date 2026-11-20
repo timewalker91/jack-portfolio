@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 
@@ -11,6 +12,14 @@ export type ContactInput = {
   name: string;
   email: string;
   message: string;
+};
+
+export type ContactSubmission = {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  submittedAt: string;
 };
 
 function validateEmail(email: string): string | undefined {
@@ -37,31 +46,69 @@ export function validateContactInput(input: ContactInput): ContactErrors {
   return errors;
 }
 
-export async function saveContactSubmission(input: ContactInput): Promise<void> {
-  const submission = {
-    name: input.name,
-    email: input.email,
-    message: input.message,
-    submittedAt: new Date().toISOString(),
-  };
+function contactDataFile(): string {
+  return path.join(process.cwd(), "data", "contact-submissions.json");
+}
 
-  const dataDir = path.join(process.cwd(), "data");
-  const dataFile = path.join(dataDir, "contact-submissions.json");
-
-  await fs.mkdir(dataDir, { recursive: true });
-
-  let submissions: unknown[] = [];
+export async function readContactSubmissions(): Promise<ContactSubmission[]> {
   try {
-    const parsed: unknown = JSON.parse(await fs.readFile(dataFile, "utf8"));
-    if (Array.isArray(parsed)) submissions = parsed;
+    const parsed: unknown = JSON.parse(
+      await fs.readFile(contactDataFile(), "utf8")
+    );
+    return Array.isArray(parsed) ? (parsed as ContactSubmission[]) : [];
   } catch {
-    submissions = [];
+    return [];
   }
+}
 
-  submissions.push(submission);
+async function writeContactSubmissions(
+  submissions: ContactSubmission[]
+): Promise<void> {
+  const dataDir = path.dirname(contactDataFile());
+  await fs.mkdir(dataDir, { recursive: true });
   await fs.writeFile(
-    dataFile,
+    contactDataFile(),
     JSON.stringify(submissions, null, 2) + "\n",
     "utf8"
   );
+}
+
+export async function saveContactSubmission(
+  input: ContactInput
+): Promise<ContactSubmission> {
+  const submission: ContactSubmission = {
+    id: randomUUID(),
+    ...input,
+    submittedAt: new Date().toISOString(),
+  };
+
+  const submissions = await readContactSubmissions();
+  submissions.push(submission);
+  await writeContactSubmissions(submissions);
+
+  return submission;
+}
+
+export async function updateContactSubmission(
+  id: string,
+  input: ContactInput
+): Promise<ContactSubmission | null> {
+  const submissions = await readContactSubmissions();
+  const index = submissions.findIndex((submission) => submission.id === id);
+  if (index === -1) return null;
+
+  const updated: ContactSubmission = { ...submissions[index], ...input };
+  submissions[index] = updated;
+  await writeContactSubmissions(submissions);
+
+  return updated;
+}
+
+export async function deleteContactSubmission(id: string): Promise<boolean> {
+  const submissions = await readContactSubmissions();
+  const remaining = submissions.filter((submission) => submission.id !== id);
+  if (remaining.length === submissions.length) return false;
+
+  await writeContactSubmissions(remaining);
+  return true;
 }

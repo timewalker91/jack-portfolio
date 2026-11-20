@@ -4,7 +4,6 @@ import path from "path";
 
 export type EventErrors = {
   name?: string;
-  date?: string;
   eventLink?: string;
   myLink?: string;
   takeaway?: string;
@@ -12,7 +11,6 @@ export type EventErrors = {
 
 export type EventInput = {
   name: string;
-  date: string;
   eventLink: string;
   myLink: string;
   takeaway: string;
@@ -21,7 +19,6 @@ export type EventInput = {
 export type EventItem = {
   id: string;
   name: string;
-  date: string;
   eventLink: string;
   myLink: string;
   takeaway: string;
@@ -43,15 +40,6 @@ export async function readEvents(): Promise<EventItem[]> {
   }
 }
 
-function isValidDateString(value: string): boolean {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-  const parsed = new Date(value + "T00:00:00Z");
-  return (
-    !Number.isNaN(parsed.getTime()) &&
-    parsed.toISOString().slice(0, 10) === value
-  );
-}
-
 function isValidUrl(value: string): boolean {
   try {
     const url = new URL(value);
@@ -64,11 +52,6 @@ function isValidUrl(value: string): boolean {
 export function validateEventInput(input: EventInput): EventErrors {
   const errors: EventErrors = {};
   if (!input.name) errors.name = "Name can't be empty.";
-  if (!input.date) {
-    errors.date = "Date can't be empty.";
-  } else if (!isValidDateString(input.date)) {
-    errors.date = "Date must be a valid date in YYYY-MM-DD format.";
-  }
   if (input.eventLink && !isValidUrl(input.eventLink)) {
     errors.eventLink = "Event link must be a valid URL (http:// or https://).";
   }
@@ -118,4 +101,17 @@ export async function updateEvent(
   );
 
   return updated;
+}
+
+export async function deleteEvent(id: string): Promise<boolean> {
+  const events = await readEvents();
+  const remaining = events.filter((event) => event.id !== id);
+  if (remaining.length === events.length) return false;
+
+  await fs.writeFile(
+    eventsDataFile(),
+    JSON.stringify(remaining, null, 2) + "\n",
+    "utf8"
+  );
+  return true;
 }

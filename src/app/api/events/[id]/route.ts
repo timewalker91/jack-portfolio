@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
-import { updateEvent, validateEventInput } from "@/lib/events";
+import {
+  deleteEvent,
+  updateEvent,
+  validateEventInput,
+} from "@/lib/events";
 import type { EventInput } from "@/lib/events";
 
 function parseInput(payload: Record<string, unknown>): EventInput {
   return {
     name: typeof payload.name === "string" ? payload.name.trim() : "",
-    date: typeof payload.date === "string" ? payload.date.trim() : "",
     eventLink:
       typeof payload.eventLink === "string" ? payload.eventLink.trim() : "",
     myLink: typeof payload.myLink === "string" ? payload.myLink.trim() : "",
@@ -14,7 +17,7 @@ function parseInput(payload: Record<string, unknown>): EventInput {
   };
 }
 
-export async function POST(
+export async function PUT(
   request: Request,
   { params }: RouteContext<"/api/events/[id]">
 ) {
@@ -49,4 +52,21 @@ export async function POST(
   }
 
   return NextResponse.json({ status: "success", event });
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: RouteContext<"/api/events/[id]">
+) {
+  const { id } = await params;
+
+  const deleted = await deleteEvent(id);
+  if (!deleted) {
+    return NextResponse.json(
+      { status: "error", error: "Event not found." },
+      { status: 404 }
+    );
+  }
+
+  return NextResponse.json({ status: "success" });
 }

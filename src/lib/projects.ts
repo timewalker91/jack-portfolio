@@ -1,80 +1,131 @@
+import { randomUUID } from "crypto";
+import { promises as fs } from "fs";
+import path from "path";
+
 export type ProjectFeature = {
   title: string;
   detail: string;
 };
 
-export type Project = {
+export type ProjectErrors = {
+  slug?: string;
+  title?: string;
+  summary?: string;
+  overview?: string;
+};
+
+export type ProjectInput = {
   slug: string;
   title: string;
-  context?: string;
+  context: string;
+  summary: string;
+  overview: string;
+  tech: string[];
+};
+
+export type Project = {
+  id: string;
+  slug: string;
+  title: string;
+  context: string;
   summary: string;
   overview: string;
   features: ProjectFeature[];
   tech: string[];
+  createdAt: string;
 };
 
-export const projects: Project[] = [
-  {
-    slug: "aide-commerce",
-    title: "Aide-commerce",
-    context: "Built with a team of 4 at AWS x A10 Hack 2026",
-    summary:
-      "Gives an AI shopping agent its own identity, checks every action it takes, and lets the user stop it mid-task; its next request is refused in about 0.7 seconds.",
-    overview:
-      "Aide-commerce was built with a team of 4 at AWS x A10 Hack 2026. It is a safety layer for AI shopping agents: the agent gets its own identity, every action it takes is checked, and the user stays in control at all times — so shopping automation stays accountable instead of running unchecked.",
-    features: [
-      {
-        title: "Agent identity",
-        detail:
-          "The AI shopping agent gets its own identity, so its actions can be attributed to it and managed separately from the user's.",
-      },
-      {
-        title: "Every action checked",
-        detail:
-          "Each action the agent takes is checked before it goes through, keeping the agent's behavior under review.",
-      },
-      {
-        title: "Stop mid-task",
-        detail:
-          "The user can stop the agent mid-task; its next request is refused in about 0.7 seconds.",
-      },
-    ],
-    tech: ["Python", "React", "AWS (Cognito, KMS, DynamoDB, Bedrock)"],
-  },
-  {
-    slug: "products-cli",
-    title: "Product Inventory CLI",
-    summary:
-      "A Python command-line tool (products.py) with add, list, get, update and delete commands, saving product records to a JSON file.",
-    overview:
-      "Product Inventory CLI is a Python command-line tool (products.py) for managing product records from the terminal. It covers the full lifecycle of a record — add, list, get, update and delete — and saves everything to a JSON file, so data persists between runs without any database setup.",
-    features: [
-      {
-        title: "add",
-        detail: "Add a new product record to the inventory.",
-      },
-      {
-        title: "list",
-        detail: "List all product records currently saved.",
-      },
-      {
-        title: "get",
-        detail: "Look up a single product record.",
-      },
-      {
-        title: "update",
-        detail: "Update an existing product record.",
-      },
-      {
-        title: "delete",
-        detail: "Remove a product record from the inventory.",
-      },
-      {
-        title: "JSON storage",
-        detail:
-          "Product records are saved to a JSON file, so data persists between runs with no database to set up.",
-      },
-    ],
-    tech: ["Python"],
-  },
-];
+function projectsDataFile(): string {
+  return path.join(process.cwd(), "data", "projects.json");
+}
+
+export async function readProjects(): Promise<Project[]> {
+  try {
+    const parsed: unknown = JSON.parse(
+      await fs.readFile(projectsDataFile(), "utf8")
+    );
+    return Array.isArray(parsed) ? (parsed as Project[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function isValidSlug(value: string): boolean {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
+}
+
+export function validateProjectInput(input: ProjectInput): ProjectErrors {
+  const errors: ProjectErrors = {};
+  if (!input.slug) {
+    errors.slug = "Slug can't be empty.";
+  } else if (!isValidSlug(input.slug)) {
+    errors.slug = "Slug must be lowercase letters, numbers, and dashes.";
+  }
+  if (!input.title) errors.title = "Title can't be empty.";
+  if (!input.summary) errors.summary = "Summary can't be empty.";
+  if (!input.overview) errors.overview = "Overview can't be empty.";
+  return errors;
+}
+
+export async function slugTaken(
+  slug: string,
+  exceptId?: string
+): Promise<boolean> {
+  const projects = await readProjects();
+  return projects.some((p) => p.slug === slug && p.id !== exceptId);
+}
+
+export async function saveProject(input: ProjectInput): Promise<Project> {
+  const project: Project = {
+    id: randomUUID(),
+    ...input,
+    features: [],
+    createdAt: new Date().toISOString(),
+  };
+
+  const projects = await readProjects();
+  projects.push(project);
+
+  const dataDir = path.dirname(projectsDataFile());
+  await fs.mkdir(dataDir, { recursive: true });
+  await fs.writeFile(
+    projectsDataFile(),
+    JSON.stringify(projects, null, 2) + "\n",
+    "utf8"
+  );
+
+  return project;
+}
+
+export async function updateProject(
+  id: string,
+  input: ProjectInput
+): Promise<Project | null> {
+  const projects = await readProjects();
+  const index = projects.findIndex((project) => project.id === id);
+  if (index === -1) return null;
+
+  const updated: Project = { ...projects[index], ...input };
+  projects[index] = updated;
+
+  await fs.writeFile(
+    projectsDataFile(),
+    JSON.stringify(projects, null, 2) + "\n",
+    "utf8"
+  );
+
+  return updated;
+}
+
+export async function deleteProject(id: string): Promise<boolean> {
+  const projects = await readProjects();
+  const remaining = projects.filter((project) => project.id !== id);
+  if (remaining.length === projects.length) return false;
+
+  await fs.writeFile(
+    projectsDataFile(),
+    JSON.stringify(remaining, null, 2) + "\n",
+    "utf8"
+  );
+  return true;
+}

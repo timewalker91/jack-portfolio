@@ -27,20 +27,24 @@ npm run lint    # run ESLint
 | --- | --- |
 | `/` | Homepage introducing Jack |
 | `/about-me` | Education, experience, and skills |
-| `/projects` | Project index |
-| `/projects/aide-commerce` | Aide-commerce — AI shopping agent safety (AWS x A10 Hack 2026) |
-| `/projects/products-cli` | Product Inventory CLI — Python CRUD tool |
+| `/projects` | Project index, loaded via the API, with Edit / Delete per project |
+| `/projects/[slug]` | Dynamically routed project detail page |
 | `/contact-me-server-form` | Contact form (Next.js Server Action) |
 | `/contact-me` | Contact form (client-side fetch) |
-| `/api/contacts` | `POST` endpoint the `/contact-me` form calls |
-| `/blogs` | Blog list, loaded via the API |
+| `/blogs` | Blog list, loaded via the API, with Edit / Delete per post |
 | `/blogs/[id]` | Dynamically routed blog post page |
-| `/events` | Industry events, conferences, and hackathons attended (read-only) |
+| `/events` | Industry events, conferences, and hackathons attended, loaded via the API, with Edit / Delete per event |
 | `/admin/blogs` | New Post — create a blog post (title + content) |
-| `/admin/events` | Add or edit events (name, date, optional links, takeaway) |
+| `/admin/events` | Add or edit events (name, optional links, takeaway); shown with LinkedIn-style relative time |
+| `/admin/contacts` | Manage contact submissions (edit / delete) |
+| `/api/contacts` | `GET` lists submissions / `POST` creates a submission |
+| `/api/contacts/[id]` | `PUT` updates / `DELETE` deletes a submission |
+| `/api/projects` | `GET` lists projects / `POST` creates a project |
+| `/api/projects/[id]` | `PUT` updates / `DELETE` deletes a project |
 | `/api/blogs` | `GET` lists posts / `POST` creates a post |
+| `/api/blogs/[id]` | `PUT` updates / `DELETE` deletes a post |
 | `/api/events` | `GET` lists events / `POST` creates an event |
-| `/api/events/[id]` | `POST` updates an event |
+| `/api/events/[id]` | `PUT` updates / `DELETE` deletes an event |
 
 ## Contact Form
 

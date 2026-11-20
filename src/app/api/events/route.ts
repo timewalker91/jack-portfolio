@@ -10,7 +10,6 @@ export async function GET() {
 function parseInput(payload: Record<string, unknown>): EventInput {
   return {
     name: typeof payload.name === "string" ? payload.name.trim() : "",
-    date: typeof payload.date === "string" ? payload.date.trim() : "",
     eventLink:
       typeof payload.eventLink === "string" ? payload.eventLink.trim() : "",
     myLink: typeof payload.myLink === "string" ? payload.myLink.trim() : "",
