@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import { Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import "./globals.css";
@@ -36,8 +37,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </Suspense>
         <main className="flex flex-1 flex-col">{children}</main>
         <footer className="border-t border-zinc-200 py-6 dark:border-zinc-800">
-          <p className="mx-auto w-full max-w-5xl px-6 text-sm text-zinc-500 dark:text-zinc-400">
-            © 2026 Jack (Kunjun) Ning
+          <p className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 text-sm text-zinc-500 dark:text-zinc-400">
+            <span>© 2026 Jack (Kunjun) Ning</span>
+            <Link
+              href="/admin"
+              className="hover:text-zinc-900 dark:hover:text-zinc-100"
+            >
+              Owner
+            </Link>
           </p>
         </footer>
       </body>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { EventItem } from "@/lib/events";
 import { relativeTime } from "@/lib/relative-time";
+import { useOwnerMode } from "@/lib/use-owner-mode";
 
 const inputClass =
   "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100";
@@ -21,6 +22,7 @@ type EditErrors = {
 };
 
 export default function EventsList() {
+  const owner = useOwnerMode();
   const [events, setEvents] = useState<EventItem[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -282,22 +284,24 @@ export default function EventsList() {
                 </div>
               ) : null}
             </div>
-            <div className="flex gap-2 border-t border-zinc-200 px-6 py-3 dark:border-zinc-800">
-              <button
-                type="button"
-                onClick={() => startEdit(event)}
-                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                onClick={() => remove(event.id)}
-                className="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-              >
-                Delete
-              </button>
-            </div>
+            {owner ? (
+              <div className="flex gap-2 border-t border-zinc-200 px-6 py-3 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => startEdit(event)}
+                  className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remove(event.id)}
+                  className="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                >
+                  Delete
+                </button>
+              </div>
+            ) : null}
           </li>
         )
       )}

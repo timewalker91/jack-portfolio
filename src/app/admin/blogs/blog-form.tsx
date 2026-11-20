@@ -1,7 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { BlogErrors } from "@/lib/blogs";
+
+const DRAFT_KEY = "blog-post-draft";
+
+type Draft = { title: string; content: string };
+
+const emptyDraft: Draft = { title: "", content: "" };
 
 const fieldClassName =
   "w-full rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 outline-none transition-colors focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-100";
@@ -12,16 +18,49 @@ function FieldError({ message }: { message?: string }) {
 }
 
 export default function BlogForm() {
+  const [values, setValues] = useState<Draft>(emptyDraft);
   const [errors, setErrors] = useState<BlogErrors>({});
   const [status, setStatus] = useState<
     "idle" | "sending" | "success" | "error"
   >("idle");
+  const [draftSaved, setDraftSaved] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const restore = () => {
+      if (cancelled) return;
+      try {
+        const raw = window.localStorage.getItem(DRAFT_KEY);
+        if (!raw) return;
+        const draft = JSON.parse(raw) as Partial<Draft>;
+        const restored: Draft = {
+          title: typeof draft.title === "string" ? draft.title : "",
+          content: typeof draft.content === "string" ? draft.content : "",
+        };
+        if (restored.title || restored.content) {
+          setValues(restored);
+          setDraftSaved(true);
+        }
+      } catch {
+        setDraftSaved(false);
+      }
+    };
+    const timer = window.setTimeout(restore, 0);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  function update(field: keyof Draft, value: string) {
+    const next = { ...values, [field]: value };
+    setValues(next);
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify(next));
+    setDraftSaved(true);
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-
     setStatus("sending");
     setErrors({});
 
@@ -29,15 +68,14 @@ export default function BlogForm() {
       const res = await fetch("/api/blogs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: String(formData.get("title") ?? ""),
-          content: String(formData.get("content") ?? ""),
-        }),
+        body: JSON.stringify(values),
       });
 
       if (res.ok) {
         setStatus("success");
-        form.reset();
+        setValues(emptyDraft);
+        window.localStorage.removeItem(DRAFT_KEY);
+        setDraftSaved(false);
         return;
       }
 
@@ -63,6 +101,12 @@ export default function BlogForm() {
         </p>
       ) : null}
 
+      {draftSaved && status !== "success" ? (
+        <p className="text-xs text-zinc-500 dark:text-zinc-400" role="note">
+          Draft saved
+        </p>
+      ) : null}
+
       <div>
         <label
           htmlFor="title"
@@ -70,7 +114,14 @@ export default function BlogForm() {
         >
           Title
         </label>
-        <input id="title" name="title" type="text" className={fieldClassName} />
+        <input
+          id="title"
+          name="title"
+          type="text"
+          value={values.title}
+          onChange={(e) => update("title", e.target.value)}
+          className={fieldClassName}
+        />
         <FieldError message={errors.title} />
       </div>
 
@@ -81,7 +132,14 @@ export default function BlogForm() {
         >
           Content
         </label>
-        <textarea id="content" name="content" rows={12} className={fieldClassName} />
+        <textarea
+          id="content"
+          name="content"
+          rows={12}
+          value={values.content}
+          onChange={(e) => update("content", e.target.value)}
+          className={fieldClassName}
+        />
         <FieldError message={errors.content} />
       </div>
 

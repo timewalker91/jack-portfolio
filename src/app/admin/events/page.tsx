@@ -1,4 +1,5 @@
 import Link from "next/link";
+import OwnerGate from "@/components/owner-gate";
 import EventsAdmin from "./events-admin";
 
 export const metadata = {
@@ -17,12 +18,14 @@ export default function EventsAdminPage() {
       <h1 className="mt-6 text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
         Events Admin
       </h1>
-      <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-        Add an event you attended, or edit an existing one.
-      </p>
-      <div className="mt-12">
-        <EventsAdmin />
-      </div>
+      <OwnerGate>
+        <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600 dark:text-zinc-400">
+          Add an event you attended, or edit an existing one.
+        </p>
+        <div className="mt-12">
+          <EventsAdmin />
+        </div>
+      </OwnerGate>
     </section>
   );
 }

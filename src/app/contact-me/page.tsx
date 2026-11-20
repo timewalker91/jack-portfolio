@@ -1,4 +1,4 @@
-import Link from "next/link";
+import OwnerLink from "@/components/owner-link";
 import ContactForm from "./contact-form";
 
 export const metadata = {
@@ -16,12 +16,12 @@ export default function Contact() {
         message via the API and I&apos;ll get back to you.
       </p>
       <ContactForm />
-      <Link
+      <OwnerLink
         href="/admin/contacts"
         className="mt-6 inline-block text-sm font-medium text-zinc-500 underline underline-offset-2 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
       >
         Manage submissions →
-      </Link>
+      </OwnerLink>
     </section>
   );
 }

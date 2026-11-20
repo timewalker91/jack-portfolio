@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import type { EventErrors, EventInput, EventItem } from "@/lib/events";
 import { relativeTime } from "@/lib/relative-time";
 
+const DRAFT_KEY = "event-draft";
+
 const emptyForm: EventInput = {
   name: "",
   eventLink: "",
@@ -30,6 +32,7 @@ export default function EventsAdmin() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [draftSaved, setDraftSaved] = useState(false);
 
   async function loadEvents() {
     try {
@@ -47,12 +50,36 @@ export default function EventsAdmin() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       void loadEvents();
+      try {
+        const raw = window.localStorage.getItem(DRAFT_KEY);
+        if (!raw) return;
+        const draft = JSON.parse(raw) as Partial<EventInput>;
+        const restored: EventInput = {
+          name: typeof draft.name === "string" ? draft.name : "",
+          eventLink:
+            typeof draft.eventLink === "string" ? draft.eventLink : "",
+          myLink: typeof draft.myLink === "string" ? draft.myLink : "",
+          takeaway:
+            typeof draft.takeaway === "string" ? draft.takeaway : "",
+        };
+        if (restored.name || restored.eventLink || restored.myLink || restored.takeaway) {
+          setValues(restored);
+          setDraftSaved(true);
+        }
+      } catch {
+        setDraftSaved(false);
+      }
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
 
   function update(field: keyof EventInput, value: string) {
-    setValues((prev) => ({ ...prev, [field]: value }));
+    const next = { ...values, [field]: value };
+    setValues(next);
+    if (!editingId) {
+      window.localStorage.setItem(DRAFT_KEY, JSON.stringify(next));
+      setDraftSaved(true);
+    }
   }
 
   function startEdit(event: EventItem) {
@@ -97,6 +124,10 @@ export default function EventsAdmin() {
         setMessage(wasEditing ? "Event updated." : "Event added.");
         setValues(emptyForm);
         setEditingId(null);
+        if (!wasEditing) {
+          window.localStorage.removeItem(DRAFT_KEY);
+          setDraftSaved(false);
+        }
         await loadEvents();
         return;
       }
@@ -126,6 +157,12 @@ export default function EventsAdmin() {
               className="rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-800 dark:border-green-900 dark:bg-green-950 dark:text-green-300"
             >
               {message}
+            </p>
+          ) : null}
+
+          {draftSaved && status !== "success" ? (
+            <p className="text-xs text-zinc-500 dark:text-zinc-400" role="note">
+              Draft saved
             </p>
           ) : null}
 

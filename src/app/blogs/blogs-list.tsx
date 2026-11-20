@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { BlogPost } from "@/lib/blogs";
+import { useOwnerMode } from "@/lib/use-owner-mode";
 
 function snippet(content: string): string {
   return content.length > 160 ? content.slice(0, 160) + "…" : content;
@@ -15,6 +16,7 @@ type EditValues = { title: string; content: string };
 type EditErrors = { title?: string; content?: string };
 
 export default function BlogsList() {
+  const owner = useOwnerMode();
   const [posts, setPosts] = useState<BlogPost[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -191,22 +193,24 @@ export default function BlogsList() {
                 Read more →
               </p>
             </Link>
-            <div className="flex gap-2 border-t border-zinc-200 px-6 py-3 dark:border-zinc-800">
-              <button
-                type="button"
-                onClick={() => startEdit(post)}
-                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                onClick={() => remove(post.id)}
-                className="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-              >
-                Delete
-              </button>
-            </div>
+            {owner ? (
+              <div className="flex gap-2 border-t border-zinc-200 px-6 py-3 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => startEdit(post)}
+                  className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remove(post.id)}
+                  className="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                >
+                  Delete
+                </button>
+              </div>
+            ) : null}
           </li>
         )
       )}
