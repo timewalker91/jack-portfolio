@@ -5,7 +5,6 @@ import ProjectCard from "@/components/project-card";
 import type { Project } from "@/lib/projects";
 
 type EditValues = {
-  slug: string;
   title: string;
   context: string;
   summary: string;
@@ -14,7 +13,6 @@ type EditValues = {
 };
 
 type EditErrors = {
-  slug?: string;
   title?: string;
   summary?: string;
   overview?: string;
@@ -28,7 +26,6 @@ export default function ProjectsList() {
   const [failed, setFailed] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [values, setValues] = useState<EditValues>({
-    slug: "",
     title: "",
     context: "",
     summary: "",
@@ -69,7 +66,6 @@ export default function ProjectsList() {
   function startEdit(project: Project) {
     setEditingId(project.id);
     setValues({
-      slug: project.slug,
       title: project.title,
       context: project.context,
       summary: project.summary,
@@ -85,7 +81,10 @@ export default function ProjectsList() {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...values,
+        title: values.title,
+        context: values.context,
+        summary: values.summary,
+        overview: values.overview,
         tech: values.tech
           .split(",")
           .map((item) => item.trim())
@@ -135,27 +134,6 @@ export default function ProjectsList() {
             key={project.id}
             className="grid gap-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900"
           >
-            <div>
-              <label
-                htmlFor="edit-slug"
-                className="mb-1.5 block text-sm font-medium text-zinc-900 dark:text-zinc-100"
-              >
-                Slug
-              </label>
-              <input
-                id="edit-slug"
-                value={values.slug}
-                onChange={(e) =>
-                  setValues({ ...values, slug: e.target.value })
-                }
-                className={inputClass}
-              />
-              {errors.slug ? (
-                <p className="mt-1.5 text-sm text-red-600 dark:text-red-400">
-                  {errors.slug}
-                </p>
-              ) : null}
-            </div>
             <div>
               <label
                 htmlFor="edit-title"

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   deleteProject,
-  slugTaken,
+  readProjects,
   updateProject,
   validateProjectInput,
 } from "@/lib/projects";
@@ -22,7 +22,7 @@ function parseTech(value: unknown): string[] {
 
 function parseInput(payload: Record<string, unknown>): ProjectInput {
   return {
-    slug: typeof payload.slug === "string" ? payload.slug.trim() : "",
+    slug: "",
     title: typeof payload.title === "string" ? payload.title.trim() : "",
     context:
       typeof payload.context === "string" ? payload.context.trim() : "",
@@ -55,10 +55,16 @@ export async function PUT(
   ) as Record<string, unknown>;
   const input = parseInput(data);
 
-  const errors = validateProjectInput(input);
-  if (Object.keys(errors).length === 0 && (await slugTaken(input.slug, id))) {
-    errors.slug = "Slug already in use.";
+  const existing = (await readProjects()).find((p) => p.id === id);
+  if (!existing) {
+    return NextResponse.json(
+      { status: "error", error: "Project not found." },
+      { status: 404 }
+    );
   }
+  input.slug = existing.slug;
+
+  const errors = validateProjectInput(input);
   if (Object.keys(errors).length > 0) {
     return NextResponse.json({ status: "error", errors }, { status: 400 });
   }
