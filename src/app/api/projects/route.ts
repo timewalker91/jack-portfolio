@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import {
   readProjects,
   saveProject,
-  slugTaken,
+  uniqueSlug,
   validateProjectInput,
 } from "@/lib/projects";
 import type { ProjectInput } from "@/lib/projects";
@@ -54,11 +54,10 @@ export async function POST(request: Request) {
     typeof payload === "object" && payload !== null ? payload : {}
   ) as Record<string, unknown>;
   const input = parseInput(data);
+  input.slug = await uniqueSlug(input.title || "project");
 
   const errors = validateProjectInput(input);
-  if (Object.keys(errors).length === 0 && (await slugTaken(input.slug))) {
-    errors.slug = "Slug already in use.";
-  }
+  delete errors.slug;
   if (Object.keys(errors).length > 0) {
     return NextResponse.json({ status: "error", errors }, { status: 400 });
   }

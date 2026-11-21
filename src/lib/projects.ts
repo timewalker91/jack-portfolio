@@ -54,6 +54,24 @@ function isValidSlug(value: string): boolean {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value);
 }
 
+export function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export async function uniqueSlug(title: string): Promise<string> {
+  const base = slugify(title) || "project";
+  let slug = base;
+  let counter = 2;
+  while (await slugTaken(slug)) {
+    slug = `${base}-${counter}`;
+    counter += 1;
+  }
+  return slug;
+}
+
 export function validateProjectInput(input: ProjectInput): ProjectErrors {
   const errors: ProjectErrors = {};
   if (!input.slug) {

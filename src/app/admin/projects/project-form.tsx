@@ -6,7 +6,6 @@ import type { ProjectErrors } from "@/lib/projects";
 const DRAFT_KEY = "project-draft";
 
 type Draft = {
-  slug: string;
   title: string;
   context: string;
   summary: string;
@@ -15,7 +14,6 @@ type Draft = {
 };
 
 const emptyDraft: Draft = {
-  slug: "",
   title: "",
   context: "",
   summary: "",
@@ -48,7 +46,6 @@ export default function ProjectForm() {
         if (!raw) return;
         const draft = JSON.parse(raw) as Partial<Draft>;
         const restored: Draft = {
-          slug: typeof draft.slug === "string" ? draft.slug : "",
           title: typeof draft.title === "string" ? draft.title : "",
           context: typeof draft.context === "string" ? draft.context : "",
           summary: typeof draft.summary === "string" ? draft.summary : "",
@@ -87,7 +84,6 @@ export default function ProjectForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          slug: values.slug,
           title: values.title,
           context: values.context,
           summary: values.summary,
@@ -134,24 +130,6 @@ export default function ProjectForm() {
           Draft saved
         </p>
       ) : null}
-
-      <div>
-        <label
-          htmlFor="slug"
-          className="mb-1.5 block text-sm font-medium text-zinc-900 dark:text-zinc-100"
-        >
-          Slug
-        </label>
-        <input
-          id="slug"
-          name="slug"
-          type="text"
-          value={values.slug}
-          onChange={(e) => update("slug", e.target.value)}
-          className={fieldClassName}
-        />
-        <FieldError message={errors.slug} />
-      </div>
 
       <div>
         <label
