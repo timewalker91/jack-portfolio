@@ -1,4 +1,3 @@
-import OwnerGate from "@/components/owner-gate";
 import ContactsAdmin from "./contacts-admin";
 
 export const metadata = {
@@ -11,9 +10,7 @@ export default function ManageSubmissions() {
       <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-50">
         Contact submissions
       </h1>
-      <OwnerGate>
-        <ContactsAdmin />
-      </OwnerGate>
+      <ContactsAdmin />
     </section>
   );
 }

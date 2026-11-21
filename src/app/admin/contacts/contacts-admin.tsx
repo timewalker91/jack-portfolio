@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ContactCard from "@/components/contact-card";
 import type { ContactSubmission } from "@/lib/contact";
-import { relativeTime } from "@/lib/relative-time";
 
 const inputClass =
   "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100";
@@ -208,49 +208,12 @@ export default function ContactsAdmin() {
             </div>
           </li>
         ) : (
-          <li
+          <ContactCard
             key={submission.id}
-            className="rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900"
-          >
-            <div className="p-6">
-              <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-                {submission.name}
-              </h2>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                <a
-                  href={`mailto:${submission.email}`}
-                  className="underline underline-offset-2"
-                >
-                  {submission.email}
-                </a>{" "}
-                ·{" "}
-                <span
-                  title={new Date(submission.submittedAt).toLocaleString()}
-                >
-                  {relativeTime(submission.submittedAt)}
-                </span>
-              </p>
-              <p className="mt-3 leading-7 text-zinc-600 dark:text-zinc-400">
-                {submission.message}
-              </p>
-            </div>
-            <div className="flex gap-2 border-t border-zinc-200 px-6 py-3 dark:border-zinc-800">
-              <button
-                type="button"
-                onClick={() => startEdit(submission)}
-                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                onClick={() => remove(submission.id)}
-                className="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-              >
-                Delete
-              </button>
-            </div>
-          </li>
+            submission={submission}
+            onEdit={startEdit}
+            onDelete={remove}
+          />
         )
       )}
     </ul>

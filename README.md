@@ -27,18 +27,17 @@ npm run lint    # run ESLint
 | --- | --- |
 | `/` | Homepage introducing Jack |
 | `/about-me` | Education, experience, and skills |
-| `/projects` | Project index, loaded via the API, with owner-only Add / Edit / Delete |
+| `/projects` | Project index, loaded via the API, with Add / Edit / Delete |
 | `/projects/[slug]` | Dynamically routed project detail page |
 | `/contact-me-server-form` | Contact form (Next.js Server Action) |
 | `/contact-me` | Contact form (client-side fetch) |
-| `/blogs` | Blog list, loaded via the API, with owner-only Edit / Delete per post |
+| `/blogs` | Blog list, loaded via the API, with Edit / Delete per post |
 | `/blogs/[id]` | Dynamically routed blog post page |
-| `/events` | Industry events, conferences, and hackathons attended, loaded via the API, with owner-only Edit / Delete per event |
-| `/admin/blogs` | New Post — create a blog post (owner only; draft autosaved to LocalStorage) |
-| `/admin/events` | Add or edit events (owner only; draft autosaved to LocalStorage); shown with LinkedIn-style relative time |
-| `/admin/projects` | Add project — create a project (owner only; draft autosaved to LocalStorage) |
-| `/admin/contacts` | Manage contact submissions — edit / delete (owner only) |
-| `/admin` | Owner dashboard — unlock owner mode with the passcode; visitors can only read |
+| `/events` | Industry events, conferences, and hackathons attended, loaded via the API, with Edit / Delete per event |
+| `/admin/blogs` | New Post — create a blog post (draft autosaved to LocalStorage) |
+| `/admin/events` | Add or edit events (draft autosaved to LocalStorage); shown with LinkedIn-style relative time |
+| `/admin/projects` | Add project — create a project (draft autosaved to LocalStorage) |
+| `/admin/contacts` | Manage contact submissions — edit / delete |
 | `/api/contacts` | `GET` lists submissions / `POST` creates a submission |
 | `/api/contacts/[id]` | `PUT` updates / `DELETE` deletes a submission |
 | `/api/projects` | `GET` lists projects / `POST` creates a project |
